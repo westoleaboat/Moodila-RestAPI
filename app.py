@@ -34,6 +34,10 @@ def create_app():
     api = Api(app)
     jwt = JWTManager(app)
 
+    # @app.before_first_request
+    # def create_tables():
+    #     with app.app_context():
+    #         db.create_all()
 
     # Register Blueprints
     api.register_blueprint(MoodBlueprint)

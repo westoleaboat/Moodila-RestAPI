@@ -14,6 +14,9 @@ class UserSchema(Schema):
         email (str): The email address of the new user (optional).
         team (str): The team the new user belongs to (required).
         
+    
+  
+    
     """
 
     id = fields.Int(dump_only=True, description="The unique identifier for the user (read-only).")
