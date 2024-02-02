@@ -1,6 +1,11 @@
+""" 
+# resources/users.py
+A Blueprint that registers info in API documentation 
+"""
+
 from flask import request, current_app, jsonify
 from flask.views import MethodView
-from flask_smorest import Blueprint
+from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
 from flask_jwt_extended import create_access_token, create_refresh_token
 from datetime import timedelta
@@ -10,6 +15,7 @@ from flask_smorest import Api
 from typing import Dict, Any
 
 # Create a Blueprint instance
+# A Blueprint in Flask-smorest is used to divide an API into multiple segments.
 blp = Blueprint("users", __name__, description="Operations on users")  #, url_prefix="/users")
 
 
@@ -31,12 +37,11 @@ class UserRegister(MethodView):
             user_data = request.json
 
             # Check if required fields are present in the JSON payload
-            # if "username" not in user_data or "password" not in user_data:
             if "username" not in user_data or "password" not in user_data or "team" not in user_data:
-                return jsonify({
-                    "error":
-                    "Username, password and team are required fields."
-                }), 400
+                response_data = {
+                    "error": "Bad request. Ensure 'username', 'password', and 'team' are included in the JSON payload."
+                }
+                return jsonify(response_data), 400
 
             # Check if the username is empty or consists only of whitespace
             if not user_data["username"].strip():
