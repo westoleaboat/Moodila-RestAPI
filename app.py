@@ -30,6 +30,8 @@ def create_app():
     
     # Access the 'users' collection in the 'Moodila' database
     app.config['MONGO_DB_USERS'] = mongo_client.Moodila.users
+    # Access the 'moods' collection in the 'Moodila' database
+    app.config['MONGO_DB_MOODS'] = mongo_client.Moodila.moods
 
     api = Api(app)
     jwt = JWTManager(app)

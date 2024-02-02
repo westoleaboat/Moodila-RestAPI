@@ -9,7 +9,7 @@ blp = Blueprint("moods", __name__, description="Operations on moods")
 # Define the route
 @blp.route('/')
 class MoodList(MethodView):
-    @blp.response(200)#, description='User created successfully.',schema=UserSchema)
+    # @blp.response(200)#, description='User created successfully.',schema=UserSchema)
     def get(self):
         """
         Handle GET requests to the / endpoint.
@@ -24,16 +24,16 @@ class MoodList(MethodView):
             Flask response: Rendered HTML template.
         """
         # Access database and collection from current app context
-        db_users = current_app.config['MONGO_DB_USERS']
+        db_moods = current_app.config['MONGO_DB_MOODS']
 
         # Fetch all documents in the users collection
-        users_collection = db_users.find({}) # cursor
+        moods_collection = db_moods.find({}) # cursor
         # print(users_collection) # debuggin purposes
 
         # Convert the cursor to a list of dictionaries
-        data = list(users_collection)
+        data = list(moods_collection)
 
-        # print(data)
+        print(data)
 
         # Render the template with the retrieved data
-        return render_template('index.html')#, moods=data)
+        return render_template('index.html', moods=data)#
