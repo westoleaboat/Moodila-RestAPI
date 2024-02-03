@@ -10,7 +10,7 @@ from passlib.hash import pbkdf2_sha256
 from flask_jwt_extended import create_access_token, create_refresh_token
 from datetime import timedelta
 # from marshmallow import fields
-from schemas import UserSchema, fields
+from schemas import UserSchema, UserRegisterSchema, fields
 from flask_smorest import Api
 from typing import Dict, Any
 
@@ -21,30 +21,19 @@ blp = Blueprint("users", __name__, description="Operations on users")  #, url_pr
 
 @blp.route("/register")
 class UserRegister(MethodView):
-   
-    def post(self):
+    @blp.arguments(UserRegisterSchema)
+    def post(self, new_user_data):
         """
         User Registration Endpoint.
 
         Registers a new user by hashing the provided password and storing user data in the database.
-
         """
         try:
             # Access database and collection from current app context
             db_users = current_app.config['MONGO_DB_USERS']
 
-            # Get user_data from JSON payload
-            user_data = request.json
-
-            # Check if required fields are present in the JSON payload
-            if "username" not in user_data or "password" not in user_data or "team" not in user_data:
-                response_data = {
-                    "error": "Bad request. Ensure 'username', 'password', and 'team' are included in the JSON payload."
-                }
-                return jsonify(response_data), 400
-
             # Check if the username is empty or consists only of whitespace
-            if not user_data["username"].strip():
+            if not new_user_data["username"].strip():
                 return jsonify({
                     "error":
                     "Username cannot be an empty string or consist only of whitespace."
@@ -52,56 +41,54 @@ class UserRegister(MethodView):
 
             # Check if the username already exists in the database
             existing_user = db_users.find_one(
-                {"username": user_data["username"]})
+                {"username": new_user_data["username"]})
             if existing_user:
                 return jsonify(
                     {"error":
                      "A user with that username already exists."}), 409
 
             # Hash the password using pbkdf2_sha256
-            hashed_password = pbkdf2_sha256.hash(user_data["password"])
+            hashed_password = pbkdf2_sha256.hash(new_user_data["password"])
 
             # Create new_user_data
-            new_user_data = {
-                'username': user_data["username"],
-                'email': user_data.get(
-                    "email",
-                    ""),  # Optional field, use get() to avoid KeyError
+            new_user = {
+                'username': new_user_data["username"],
+                'email': new_user_data['email'],
                 'password': hashed_password,
-                'team': user_data["team"]
+                'team': new_user_data["team"]
             }
 
             # Insert the new user document into the users collection
-            db_users.insert_one(new_user_data)
+            db_users.insert_one(new_user)
 
-            additional_claim = {'team': new_user_data['team']}
+            additional_claim = {'team': new_user['team']}
             register_token_expires_in = timedelta(minutes=30)
 
             access_token = create_access_token(
-                identity=str(new_user_data["_id"]),
+                identity=str(new_user["_id"]),
                 fresh=True,
-                additional_claims={'team': new_user_data['team']},
+                additional_claims={'team': new_user['team']},
                 expires_delta=register_token_expires_in)
-            refresh_token = create_refresh_token(str(new_user_data["_id"]))
+            refresh_token = create_refresh_token(str(new_user["_id"]))
 
             # Construct the response
             response_data = {
                 "message": "User created successfully.",
                 "user_data": {
-                    "username": new_user_data["username"],
-                    "email": new_user_data["email"],
-                    "team": new_user_data["team"]
+                    "username": new_user["username"],
+                    "email": new_user["email"],
+                    "team": new_user["team"]
                 },
                 "access_token": access_token,
                 "refresh_token": refresh_token,
                 "expires_in": register_token_expires_in.total_seconds(),
             }
 
-            # @blp.response(jsonify(response_data))
             return jsonify(response_data), 201
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
 
 
 @blp.route("/login")

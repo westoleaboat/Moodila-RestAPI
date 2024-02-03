@@ -5,6 +5,7 @@ from flask_smorest import Blueprint, abort
 from bson import ObjectId
 import json
 from tabulate import tabulate
+from schemas import MoodSchema
 
 
 # Create a Blueprint instance
@@ -52,18 +53,60 @@ class MoodList(MethodView):
                 }
                 return jsonify(response_data), 500
 
-        # return jsonify(data)
-
-        # # # Print data as a table with loop index
+        # Print data as a table with loop index
         # table_data = [(i + 1, mood) for i, mood in enumerate(data)]
         # table_headers = ["Index", "Data"]
         # table_format = "grid"  # You can change it to "grid", "pipe", "html", etc.
 
         # print(tabulate(table_data, headers=table_headers, tablefmt=table_format))
         
+        # return render_template('index.html', moods=data)
 
-        # Render the template with the retrieved data
-        # return render_template('index.html', moods=data)#
+# Add a mood
+@blp.route("/mood")
+class AddMood(MethodView):
+    @blp.arguments(MoodSchema)
+    def post(self, mood_data):
+        """
+        Add a new Mood to the Database.
+
+        Accesses MongoDB client and database from the current app context,
+        retrieves data from the POST request JSON payload, and adds a new
+        mood to the 'moods' collection in the 'Moodila' database.
+
+        Returns:
+            Flask response: JSON response indicating success or failure.
+        """
+        try:
+            # Access database and collection from current app context
+            db_moods = current_app.config['MONGO_DB_MOODS']
+
+            # Get mood data from JSON payload in the POST request
+            # mood_data = request.json
+
+            # Create a new mood dictionary from JSON payload
+            new_mood = {
+                'title': mood_data["title"],
+                'quote': mood_data["quote"],
+                'author': mood_data["author"]
+            }
+
+            # Insert the new mood into the MongoDB collection
+            db_moods.insert_one(new_mood)
+            new_mood.pop("_id") # avoid ObjectId bug
+            # Return a success message
+            response_data = {
+                "message": "Mood added successfully.",
+                "mood_data": new_mood
+            }
+            return jsonify(response_data), 201
+
+        except Exception as e:
+            # Handle exceptions and return an appropriate JSON response
+            response_data = {
+                "error": str(e)
+            }
+            return jsonify(response_data), 500
 
 @blp.route('/mood/<string:mood_id>')
 # @blp.route('/mood/<i:mood_id>')
