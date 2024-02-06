@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields
-
+from datetime import datetime
 
 
 class MoodSchema(Schema):
@@ -7,6 +7,8 @@ class MoodSchema(Schema):
     title=fields.Str(required=True)
     quote=fields.Str(required=True)
     author=fields.Str(required=True)
+    created_at = fields.DateTime(dump_only=True, format="%Y-%m-%dT%H:%M:%S.%fZ", missing=lambda: datetime.utcnow())
+
 
     class Meta:
         """

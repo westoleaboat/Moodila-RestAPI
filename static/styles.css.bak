@@ -1,0 +1,371 @@
+* {
+    padding: 0;
+    margin: 0;
+    font-family: 'Tajawal', sans-serif;
+
+}
+
+main {
+    /* justify-content: center; */
+    /* display: flex; */
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    /* height: 100vh; */
+    justify-content: space-between;
+
+}
+
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 5rem;
+}
+
+header h3 {
+    font-size: 40px;
+}
+
+h1 {
+    padding: 2rem 0 0 0;
+    font-size: 60px;
+}
+
+
+
+.block-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tabs__body {
+    display: flex;
+    gap: 4rem;
+
+    width:100%;
+    
+}
+
+.input-field{
+    border: none;
+    outline: none;
+    min-width: 750px;
+}
+
+.sidebar {
+    display: flex;
+    min-width: 140px;
+    max-width: 400px;
+    background-color: gray;
+    color: white;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+    /* height: 400px; */
+    align-items: center;
+    justify-content: space-evenly;
+    margin-left: 1rem;
+
+}
+
+.sidebar .title {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+.upload-button {
+    display: inline-block;
+    padding: 8px 20px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+
+.content {
+    max-width: 1400px;
+    display: flex;
+}
+
+.content_posts {
+    /* padding-top: 4rem; */
+    max-width: 1400px;
+    /* overflow: hidden; */
+    display: flex;
+    flex-direction: row-reverse;
+    /* justify-content: space-around; */
+    gap: 2.5rem;
+    /* justify-content: center; */
+}
+
+.single-box {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    max-width: 1000px;
+    grid-gap: 1rem;
+}
+
+.single-post {
+    border-radius: 12px;
+    background: #80808047;
+    max-height: 250px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+}
+
+.single-post h3 {
+    padding-bottom: 0.5rem;
+}
+
+.single-post p[content]{
+    /* background: rebeccapurple; */
+    overflow: hidden;
+    /* border-bottom: linear-gradient(180deg, transparent, #80808047); */
+    /* height: ; */
+    /* background: linear-gradient(#80808047, pink); */
+    /* border-bottom: 2px solid black; */
+    /* height: 70%; */
+    font-size: 12px;
+}
+
+.single-post p[author]{
+    /* display: flex; */
+    display: none;
+    align-items: end;
+    position: absolute;
+    bottom: 0;
+    padding: 0.5rem 0;
+    /* background: #80808047; */
+
+    color: white;
+
+
+}
+
+
+.latest {
+    display: flex;
+    max-width: 200px;
+    padding: 1rem;
+    font-size: 14px;
+    /* font-weight: lighter; */
+    background: #4e4a4a;
+    color: #e91e63;
+    border: 3px solid #e91e63;
+    border-radius: 12px;
+}
+
+.latest p{
+    /* padding: 1rem; */
+    /* font-weight: lighter; */
+}
+
+.sidebar ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    /* padding: 0.3rem; */
+}
+
+.sidebar p {
+    /* padding: 0.5rem; */
+    display: flex;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: bold;
+    /* border-radius: 16px; */
+}
+
+
+
+.sidebar li {
+    gap: 0.2rem;
+    
+    padding: 0.5rem;
+    list-style-type: none;
+    font-size: 20px;
+    background-color: #62d1ac;
+    
+}
+
+.sidebar li:hover {
+    cursor: pointer;
+    background-color: aqua;
+}
+
+.sidebar li .selected {
+    background-color: greenyellow;
+
+}
+
+::-webkit-scrollbar {
+    display: none;
+  }
+
+
+
+.tabs__content {
+    display: none;
+}
+
+.tabs__content textarea {
+    display: none;
+}
+
+.options {
+    /* display: flex;
+    padding-bottom: 2rem; */ 
+    /* gap: 2rem; */
+}
+
+/* both buttons */
+.options button {
+    /* background: none;
+    border: none;
+    padding: 0.5rem 2rem;
+    justify-content: center; */
+    padding: 0.5rem 2rem;
+    border-radius: 12px;
+    overflow: hidden;
+
+
+}
+
+.options button:hover {
+    cursor: pointer;
+}
+
+.delete-button{
+    background: none;
+    /* border: 2px solid black;  */
+    border: none;
+    background-color: #e91e63;
+    color: white;
+    font-size: 20px;
+}
+
+.delete-button:hover{
+    background-color: gray;
+
+
+}
+
+.save-button{
+    background: none;
+    border: none; 
+    background-color: aquamarine;
+    padding: 0.5rem 2rem;
+    font-size: 20px;
+}
+
+.save-button:hover{
+    cursor: pointer;
+    color: white;
+    background-color: gray;
+
+}
+
+
+
+.tabs__content .options ul {
+    display: none;
+}
+
+
+.tabs__content.selected .options ul{
+    display: flex;
+    list-style-type: none;
+    background: none;
+    border: none;
+    padding-bottom: 2rem;
+    gap: 2rem;
+}
+
+.tabs__content.selected {
+    max-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    width: 1000px;
+}
+
+.tabs__content.selected textarea {
+    display: block;
+    background-color: #80808047;
+    border-radius: 12px;
+    overflow-y: scroll;
+    padding: 1.5rem 2rem;
+    height: 500px;
+    font-size: 22px;
+}
+
+.big-textarea {
+    width: 600px;
+    height: 300px;
+}
+
+
+footer {
+    max-width: 1400px;
+    display: flex;
+    /* justify-content: center; */
+    align-self: center;
+}
+
+/* Style the modal */
+.modal {
+    display: none; /* Hide the modal by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Style the modal content */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    border-radius: 12px;
+}
+
+.modal-textarea {
+    display: flex;
+    flex-direction: column;
+}
+
+.textarea {
+    display: none;
+}
+
+/* Style the close button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

@@ -6,66 +6,108 @@ from bson import ObjectId
 import json
 from tabulate import tabulate
 from schemas import MoodSchema
+from datetime import datetime
 
 
 # Create a Blueprint instance
 blp = Blueprint("moods", __name__, description="Operations on moods")
 
+
+
 # Define the route
 @blp.route('/')
 class MoodList(MethodView):
-    # @blp.response(200)#, description='User created successfully.',schema=UserSchema)
     def get(self):
         """
-        List all Moods in Database
+        Retrieve and display moods based on their creation date.
 
-        Accesses MongoDB client and database from the current app context,
-        retrieves all documents from the 'users' collection in the 'Moodila'
-        database, converts the cursor to a list of dictionaries, and prints
-        the retrieved data. Finally, renders the 'index.html' template with
-        the retrieved data.
+        Accesses the MongoDB client and database from the current app context,
+        retrieves all mood documents from the 'Moodila' database, and categorizes
+        them based on their creation date. Moods created today, within the last
+        week, and older moods are separated into different lists. Each mood's
+        '_id' field is removed, and an 'index' field is added with the current
+        index. The 'created_at' date is formatted for display. Finally, the 
+        retrieved moods are passed to the 'index.html' template for rendering.
 
         Returns:
             Flask response: Rendered HTML template.
         """
         try:
-            # Access database and collection from current app context
+            # Access database and collection from the current app context
             db_moods = current_app.config['MONGO_DB_MOODS']
 
-            # Fetch all documents in the users collection
-            moods_collection = db_moods.find({}) # cursor
-            # print(users_collection) # debuggin purposes
+            # Fetch all mood documents from the collection
+            moods_collection = db_moods.find({})
 
             # Convert the cursor to a list of dictionaries
             data = list(moods_collection)
 
-            # Remove the '_id' field from each dictionary in 'data'
-            for i, item in enumerate(data, start=1):
-                item.pop("_id")
-                item["index"] = i  # Add an 'index' field with the current index
+            # Separate moods based on 'created_at' date
+            today_moods = []
+            this_week_moods = []
+            older_moods = []
 
-            return jsonify(data)
+            # Define today's date without time
+            today = datetime.utcnow().date()
+
+            # Format today's date as 'day month year'
+            today_date = today.strftime('%d %b %Y')
+
+            # Parse today_date string to datetime.date object
+            today_date_obj = datetime.strptime(today_date, '%d %b %Y').date()
+
+            # Iterate over each mood in the data
+            for i, item in enumerate(data, start=1):
+                # Remove the '_id' field from each dictionary
+                item.pop("_id")
+                # Add an 'index' field with the current index
+                item["index"] = i
+                # Format the 'created_at' date for display
+                item["formatted_created_at"] = datetime.strftime(item["created_at"], '%d %b')
+
+                # Check if the mood was created today
+                if item['created_at'].date() == today:
+                    today_moods.append(item)
+                # Check if the mood was created within the last 7 days
+                elif (today_date_obj - item['created_at'].date()).days <= 7:
+                    this_week_moods.append(item)
+                # Otherwise, the mood is older
+                else:
+                    older_moods.append(item)
+
+            # Render the 'index.html' template with the categorized moods
+            return render_template('index.html',
+                                   moods=reversed(data),
+                                   today_date=today_date,
+                                   today_moods=today_moods,
+                                   this_week_moods=this_week_moods,
+                                   older_moods=older_moods)
 
         except Exception as e:
-                # Handle exceptions and return an appropriate JSON response
-                response_data = {
-                    "error": str(e)
-                }
-                return jsonify(response_data), 500
+            # Handle exceptions and return an appropriate JSON response
+            response_data = {"error": str(e)}
+            return jsonify(response_data), 500
 
-        # Print data as a table with loop index
-        # table_data = [(i + 1, mood) for i, mood in enumerate(data)]
-        # table_headers = ["Index", "Data"]
-        # table_format = "grid"  # You can change it to "grid", "pipe", "html", etc.
 
-        # print(tabulate(table_data, headers=table_headers, tablefmt=table_format))
+            # Print data as a table with loop index
+            # table_data = [(i + 1, mood) for i, mood in enumerate(data)]
+            # table_headers = ["Index", "Data"]
+            # table_format = "html"  # You can change it to "grid", "pipe", "html", etc.
+
+            # print(tabulate(table_data, headers=table_headers, tablefmt=table_format))
+
+
+
+
+    
+
         
-        # return render_template('index.html', moods=data)
+        
 
 # Add a mood
 @blp.route("/mood")
 class AddMood(MethodView):
-    @blp.arguments(MoodSchema)
+    @blp.arguments(MoodSchema(exclude=['created_at']))
     def post(self, mood_data):
         """
         Add a new Mood to the Database.
@@ -84,16 +126,25 @@ class AddMood(MethodView):
             # Get mood data from JSON payload in the POST request
             # mood_data = request.json
 
+            # Set 'created_at' to the current time
+            mood_data['created_at'] = datetime.utcnow()
+
             # Create a new mood dictionary from JSON payload
             new_mood = {
                 'title': mood_data["title"],
                 'quote': mood_data["quote"],
-                'author': mood_data["author"]
+                'author': mood_data["author"],
+                # 'created_at': mood_data['created_at'].strftime('%d %b - %H:%M')
+                'created_at': mood_data['created_at']
             }
 
             # Insert the new mood into the MongoDB collection
             db_moods.insert_one(new_mood)
             new_mood.pop("_id") # avoid ObjectId bug
+
+            # Format 'created_at' to display only the day and time
+            # new_mood['formatted_created_at'] = new_mood['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+            
             # Return a success message
             response_data = {
                 "message": "Mood added successfully.",
