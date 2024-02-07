@@ -13,7 +13,6 @@ from datetime import datetime
 blp = Blueprint("moods", __name__, description="Operations on moods")
 
 
-
 # Define the route
 @blp.route('/')
 class MoodList(MethodView):
@@ -79,9 +78,9 @@ class MoodList(MethodView):
             return render_template('index.html',
                                    moods=reversed(data),
                                    today_date=today_date,
-                                   today_moods=today_moods,
-                                   this_week_moods=this_week_moods,
-                                   older_moods=older_moods)
+                                   today_moods=reversed(today_moods),
+                                   this_week_moods=reversed(this_week_moods),
+                                   older_moods=reversed(older_moods))
 
         except Exception as e:
             # Handle exceptions and return an appropriate JSON response
@@ -96,13 +95,6 @@ class MoodList(MethodView):
 
             # print(tabulate(table_data, headers=table_headers, tablefmt=table_format))
 
-
-
-
-    
-
-        
-        
 
 # Add a mood
 @blp.route("/mood")

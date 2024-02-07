@@ -3,8 +3,13 @@ from dotenv import load_dotenv
 from flask_smorest import Api
 from resources.mood import blp as MoodBlueprint
 from resources.users import blp as UsersBlueprint, UserRegister
+# JTW user auth
 from flask_jwt_extended import JWTManager
+# MongoDB
 from pymongo import MongoClient
+# SocketIO
+from flask_socketio import SocketIO, emit
+
 
 def create_app():
     app = Flask(__name__)
@@ -20,6 +25,10 @@ def create_app():
     app.config["OPENAPI_URL_PREFIX"] = "/"
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
+
+    # socketio = SocketIO(app, cors_allowed_origins="http://127.0.0.1:5000",async_mode='eventlet')
+    socketio = SocketIO(app, cors_allowed_origins="http://127.0.0.1:5000",async_mode='threading')
+
 
     # MongoDB configuration
     # app.config['MONGO_URI']= 'mongodb+srv://Tomaschac@fedos27.hrtdm4r.mongodb.net/' 
@@ -47,4 +56,9 @@ def create_app():
 
  
 
-    return app
+    return app#, socketio
+
+    
+# if __name__ == "__main__":
+#     app = create_app()
+#     app.run(debug=True)

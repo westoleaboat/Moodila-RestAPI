@@ -24,6 +24,20 @@ run application
 # export FLASK_APP=app.py (if needed)
 flask run
 ```
+or try:
+```
+flask --app app run --debug
+```
+or 
+``` 
+flask --app app run --debugger
+```
+or 
+```
+export FLASK_APP=app.py
+export FLASK_DEBUG=1   
+flask run
+```
 you should see the following:
 ```
 * Serving Flask app 'app'

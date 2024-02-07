@@ -2,7 +2,9 @@
     <div data-tabs id="{{ mood.index }}" class="single-mood">
 
         <div class="single-mood-quote">
-            <p class='quote'>{{ mood.quote[:200] | wordwrap }}...</p>
+            <div class='quote'>
+                <p>{{ mood.quote[:200] | wordwrap }}...</p>
+            </div>
             <p class='date'>{{ mood.formatted_created_at }}</p>
         </div>
 

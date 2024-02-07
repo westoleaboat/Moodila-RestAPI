@@ -8,6 +8,7 @@
 main {
     max-width: 1600px;
     margin: 0 auto;
+    /* overflow: hidden; */
 }
 
 body {
@@ -24,6 +25,7 @@ ul {
     display: flex;
     gap: 1.5rem;
     padding: 2rem 0;
+    white-space: inherit;
 }
 
 li {
@@ -32,7 +34,7 @@ li {
     justify-content: center; /* Center content vertically */
     /* align-items: center; Center content horizontally */
     /* padding: 1.5rem; */
-    width: 295px; /* Instead of setting both min-width and max-width */
+    min-width: 295px; /* Instead of setting both min-width and max-width */
     /* max-height: 273px; Instead of setting both min-height and max-height */
     /* background-color: #D9D9D9; */
 }
@@ -70,7 +72,7 @@ button.new-mood {
     
 }
 
-.single-mood-quote p.quote {
+.single-mood-quote .quote {
     display: flex;
     /* color: red; */
     width: 100%;
