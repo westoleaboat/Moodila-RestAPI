@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Moodila - Share Your Mood</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Import fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxygen&family=Tajawal:wght@200;400;900&display=swap" rel="stylesheet">
+    <!-- Include Socket.IO library -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <!-- Main content section -->
+    <main>
+        <!-- Page header with user name and current date -->
+        <header>
+            <h1>Houdy, Firstname Lastname</h1>
+            Live <a href="https://moodila.onrender.com/swagger-ui" target="_blank">API</a> or <a href="https://moodila.onrender.com/" target="_blank">Main</a>
+            <!-- Display current date -->
+            <p class="date_today">{{ today_date }}</p>
+            <!-- Button to create a new mood -->
+            <button class="new-mood">New mood</button>
+        </header>
+        
+        <!-- Section for moods created today -->
+        <h3>Today</h3>
+        <hr>
+        <!-- Unordered list to display moods created today -->
+        <ul>
+            <!-- Iterate over moods created today and include mood template for each -->
+            {% for mood in today_moods %}
+            {% include 'mood_template.html' %}
+            {% endfor %}
+        </ul>
+        
+        <!-- Section for moods created this week -->
+        <h3>This week</h3>
+        <hr>
+        <!-- Unordered list to display moods created this week -->
+        <ul>
+            <!-- Iterate over moods created this week and include mood template for each -->
+            {% for mood in this_week_moods %}
+            {% include 'mood_template.html' %}
+            {% endfor %}
+        </ul>
+        
+        <!-- Section for older moods -->
+        <h3>Older</h3>
+        <hr>
+        <!-- Unordered list to display older moods -->
+        <ul>
+            <!-- Iterate over older moods and include mood template for each -->
+            {% for mood in older_moods %}
+            {% include 'mood_template.html' %}
+            {% endfor %}
+        </ul>
+        
+    </main>
+</body>
+</html>

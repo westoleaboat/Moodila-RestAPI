@@ -1,2 +1,2 @@
-FLASK_APP=app
+FLASK_APP=pyinstance.py
 FLASK_DEBUG=True

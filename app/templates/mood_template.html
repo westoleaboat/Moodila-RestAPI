@@ -1,0 +1,21 @@
+<li>
+    <div data-tabs id="{{ mood.index }}" class="single-mood">
+
+        <div class="single-mood-quote">
+            <div class='quote'>
+                <p>{{ mood.quote[:200] | wordwrap }}...</p>
+            </div>
+            <p class='date'>{{ mood.formatted_created_at }}</p>
+        </div>
+
+        <div class="single-mood-toolbar">
+            <div>
+                <p>{{ mood.author }}</p>
+            </div>
+            <div>
+                <p>Read more</p>
+            </div>
+        </div>
+
+    </div>
+</li>
