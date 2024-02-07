@@ -21,22 +21,31 @@ pip install -r requirements.txt
 
 run application
 ```
-# export FLASK_APP=app.py (if needed)
+# export FLASK_APP=pyinstance.py (if needed)
 flask run
 ```
-or try:
+or with Gunicorn:
 ```
-flask --app app run --debug
+gunicorn --bind 127.0.0.1:5000 "pyinstance:create_app('default')"
 ```
-or 
-``` 
-flask --app app run --debugger
+you should see the following:
 ```
-or 
+[2024-02-07 10:52:53 +0200] [236939] [INFO] Starting gunicorn 20.1.0
+[2024-02-07 10:52:53 +0200] [236939] [INFO] Listening at: http://127.0.0.1:5000 (236939)
+[2024-02-07 10:52:53 +0200] [236939] [INFO] Using worker: sync
+[2024-02-07 10:52:53 +0200] [236940] [INFO] Booting worker with pid: 236940
 ```
-export FLASK_APP=app.py
-export FLASK_DEBUG=1   
-flask run
+To run with **Docker**:
+first create docker image:
+```
+# with dockerd (daemon) running
+docker build -t <YOUR-IMAGE-NAME> .
+# the a dot (.) at the end of previous command is no mistake
+```
+
+then run the docker container locally:
+```
+docker run -p 5000:5000 -w /app -v "$(pwd):/app" <YOUR-IMAGE-NAME> sh -c "flask run --host 0.0.0.0"
 ```
 you should see the following:
 ```
