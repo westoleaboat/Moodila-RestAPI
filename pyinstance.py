@@ -2,7 +2,7 @@
 '''This module script is where the application instance is defined'''
 
 import os
-from app import create_app#, db
+from app import create_app#, socketio#, db
 # from app.models import User, Role, Permission
 # import click
 # from flask_migrate import Migrate
@@ -14,17 +14,10 @@ used. Flask-Migrate and the custom context for the Python shell are then initial
 '''
 # app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 # config_name = create_app(os.getenv('FLASK_CONFIG') or 'default')
-app, socketio = create_app(os.getenv('FLASK_CONFIG') or 'default')
+app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
-# app = create_app(os.getenv('FLASK_CONFIG') or 'default')
-# migrate = Migrate(app, db)
-
-# @app.shell_context_processor
-# def make_shell_context():
-#     return dict(db=db, User=User, Role=Role, Permission=Permission)
-# Create the Flask app instance
-# app, socketio = create_app(config_name)
 
 if __name__ == "__main__":
     # Run the Flask app using the Flask CLI command
     socketio.run(app, debug=True)
+    # app.run(app, debug=True)

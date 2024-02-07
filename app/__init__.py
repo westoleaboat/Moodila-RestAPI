@@ -3,8 +3,6 @@
 from flask import Flask
 from dotenv import load_dotenv
 from flask_smorest import Api
-# from resources.mood import blp as MoodBlueprint
-# from resources.users import blp as UsersBlueprint, UserRegister
 # config
 from config import config
 # JTW user auth
@@ -38,7 +36,6 @@ def create_app(config_name):
     # socketio = SocketIO(app, cors_allowed_origins="http://127.0.0.1:5000",async_mode='eventlet')
     socketio = SocketIO(app, cors_allowed_origins="http://127.0.0.1:5000",async_mode='threading')
 
-
     # MongoDB configuration
     # app.config['MONGO_URI']= 'mongodb+srv://Tomaschac@fedos27.hrtdm4r.mongodb.net/' 
     mongo_client = MongoClient('mongodb+srv://Tomaschac:cat@fedos27.hrtdm4r.mongodb.net/', username='Tomaschac', password='cat')
@@ -67,7 +64,7 @@ def create_app(config_name):
 
  
 
-    return app, socketio
+    return app#, socketio
 
     
 # if __name__ == "__main__":
