@@ -12,6 +12,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Oxygen&family=Tajawal:wght@200;400;900&display=swap" rel="stylesheet">
     <!-- Include Socket.IO library -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    
+    
+    
+    
+    
 </head>
 <body>
     <!-- Main content section -->
@@ -60,5 +66,15 @@
         </ul>
         
     </main>
+    <script src="/static/js/script.js" type="module" defer></script>
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+        var socket = io.connect('http://localhost:5000');
+        socket.on('connect', function() {
+            socket.emit('my event', {data: 'I\'m connected!'});
+        });
+    </script> -->
+
 </body>
 </html>

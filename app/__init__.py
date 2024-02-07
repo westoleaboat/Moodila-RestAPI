@@ -10,7 +10,11 @@ from flask_jwt_extended import JWTManager
 # MongoDB
 from pymongo import MongoClient
 # SocketIO
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO#, emit
+
+
+# socketio = SocketIO(app, cors_allowed_origins="http://127.0.0.1:5000",async_mode='threading')
+socketio = SocketIO(cors_allowed_origins="http://127.0.0.1:5000",async_mode='threading')
 
 
 def create_app(config_name):
@@ -34,7 +38,8 @@ def create_app(config_name):
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
     # socketio = SocketIO(app, cors_allowed_origins="http://127.0.0.1:5000",async_mode='eventlet')
-    socketio = SocketIO(app, cors_allowed_origins="http://127.0.0.1:5000",async_mode='threading')
+    # socketio = SocketIO(app, cors_allowed_origins="http://127.0.0.1:5000",async_mode='threading')
+    # socketio = SocketIO(app, cors_allowed_origins="http://127.0.0.1:5000",async_mode='threading')
 
     # MongoDB configuration
     # app.config['MONGO_URI']= 'mongodb+srv://Tomaschac@fedos27.hrtdm4r.mongodb.net/' 
@@ -50,6 +55,7 @@ def create_app(config_name):
 
     api = Api(app)
     jwt = JWTManager(app)
+    socketio.init_app(app)
 
     # @app.before_first_request
     # def create_tables():
@@ -65,6 +71,7 @@ def create_app(config_name):
  
 
     return app#, socketio
+    # return socketio
 
     
 # if __name__ == "__main__":

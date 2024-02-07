@@ -27,6 +27,8 @@ flask run
 or with Gunicorn:
 ```
 gunicorn --bind 127.0.0.1:5000 "pyinstance:create_app('default')"
+# improved
+gunicorn -w 1 --threads 100 --log-level debug --bind 127.0.0.1:5000 "pyinstance:create_app('default')"
 ```
 you should see the following:
 ```
