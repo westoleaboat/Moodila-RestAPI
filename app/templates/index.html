@@ -11,7 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oxygen&family=Tajawal:wght@200;400;900&display=swap" rel="stylesheet">
     <!-- Include Socket.IO library -->
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <!-- <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script> -->
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
 
     
     
@@ -22,6 +23,7 @@
 <body>
     <!-- Main content section -->
     <main>
+
         <!-- Page header with user name and current date -->
         <header>
             <h1>Houdy, Firstname Lastname</h1>
@@ -31,50 +33,63 @@
             <!-- Button to create a new mood -->
             <button class="new-mood">New mood</button>
         </header>
+
         
         <!-- Section for moods created today -->
-        <h3>Today</h3>
-        <hr>
-        <!-- Unordered list to display moods created today -->
-        <ul>
-            <!-- Iterate over moods created today and include mood template for each -->
-            {% for mood in today_moods %}
-            {% include 'mood_template.html' %}
-            {% endfor %}
-        </ul>
+        <section>
+            
+            <h3>Today</h3>
+            <hr>
+            <!-- Unordered list to display moods created today -->
+            <ul>
+                <!-- Iterate over moods created today and include mood template for each -->
+                {% for mood in today_moods %}
+                {% include 'mood_template.html' %}
+                {% endfor %}
+            </ul>
+        </section>
         
         <!-- Section for moods created this week -->
-        <h3>This week</h3>
-        <hr>
-        <!-- Unordered list to display moods created this week -->
-        <ul>
-            <!-- Iterate over moods created this week and include mood template for each -->
-            {% for mood in this_week_moods %}
-            {% include 'mood_template.html' %}
-            {% endfor %}
-        </ul>
-        
+        <section>
+
+            <h3>This week</h3>
+            <hr>
+            <!-- Unordered list to display moods created this week -->
+            <ul>
+                <!-- Iterate over moods created this week and include mood template for each -->
+                {% for mood in this_week_moods %}
+                {% include 'mood_template.html' %}
+                {% endfor %}
+            </ul>
+        </section>
+            
         <!-- Section for older moods -->
-        <h3>Older</h3>
-        <hr>
-        <!-- Unordered list to display older moods -->
-        <ul>
-            <!-- Iterate over older moods and include mood template for each -->
-            {% for mood in older_moods %}
-            {% include 'mood_template.html' %}
-            {% endfor %}
-        </ul>
+        <section>
+
+            <h3>Older</h3>
+            <hr>
+            <!-- Unordered list to display older moods -->
+            <ul>
+                <!-- Iterate over older moods and include mood template for each -->
+                {% for mood in older_moods %}
+                {% include 'mood_template.html' %}
+                {% endfor %}
+            </ul>
+        </section>
+            
+        <section>
+             <div class="modal" style="display: none">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <p id="full-quote-content">{{ selected_id }}</p>
+                </div>
+            </div>
+        </section>
         
     </main>
+    
     <script src="/static/js/script.js" type="module" defer></script>
 
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-    <script type="text/javascript" charset="utf-8">
-        var socket = io.connect('http://localhost:5000');
-        socket.on('connect', function() {
-            socket.emit('my event', {data: 'I\'m connected!'});
-        });
-    </script> -->
 
 </body>
 </html>

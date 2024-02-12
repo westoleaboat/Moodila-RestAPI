@@ -4,6 +4,8 @@
         <div class="single-mood-quote">
             <div class='quote'>
                 <p>{{ mood.quote[:200] | wordwrap }}...</p>
+                <!-- Hidden full quote -->
+                <!-- <p class='full-quote' style="display: none;">{{ mood.quote }}</p> -->
             </div>
             <p class='date'>{{ mood.formatted_created_at }}</p>
         </div>
@@ -13,9 +15,10 @@
                 <p>{{ mood.author }}</p>
             </div>
             <div>
-                <p>Read more</p>
+                <button class="read-more-btn">Read more</button>
             </div>
         </div>
 
     </div>
 </li>
+

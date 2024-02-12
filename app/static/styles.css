@@ -88,3 +88,12 @@ button.new-mood {
     padding: 0.5rem;
 
 }
+
+.modal {
+    border: 1px solid red;
+    display: none;
+}
+
+section .modal {
+
+}
