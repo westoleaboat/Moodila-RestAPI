@@ -7,10 +7,34 @@ import json
 from tabulate import tabulate
 from schemas import MoodSchema
 from datetime import datetime
-
+from flask_socketio import send, emit
+from app import socketio
 
 # Create a Blueprint instance
 mood_blp = Blueprint("moods", __name__, description="Operations on moods")
+
+
+# handle ID 
+# @socketio.on('selected_id')
+# def handle_console_log_id(message):
+#     global selected_id
+#     if 'value' in data:
+#         # selected_id = message['value']
+#         selected_id = data.get('value')
+#         print(f'this is your item id: \n{selected_id}\n')
+#     if 'indexnum' in data:
+#         tab_index = message['indexnum']
+#         print(f'this is your item INDEX: \n{tab_index}\n')
+
+#     else:
+#         print('invalid message format')
+#     return selected_id
+
+
+# selected_id = None
+                    
+                    
+# selected_id = None
 
 
 # Define the route
@@ -31,7 +55,12 @@ class MoodList(MethodView):
         Returns:
             Flask response: Rendered HTML template.
         """
+        # global selected_id
+        # selected_id = None
+
         try:
+            # selected_id = None
+
             # Access database and collection from the current app context
             db_moods = current_app.config['MONGO_DB_MOODS']
 
@@ -74,13 +103,45 @@ class MoodList(MethodView):
                 else:
                     older_moods.append(item)
 
+            
+            
+
+            selected_id = data[0]
+            # Handle the 'selected_id' event from the client
+            @socketio.on('selected_id')
+            def handle_selected_id(message):
+                global selected_id
+                
+                if 'value' in message and 'indexnum' in message:
+                    # selected_id = message['value']
+                    new_selected_id = message['value']
+                    if new_selected_id is not None:
+                        selected_id = new_selected_id
+                    tab_index = message['indexnum']
+                    print(f'This is your item id: {selected_id}')
+                    print(f'This is your item index: {tab_index}')
+                    print(selected_id)
+
+                    return selected_id
+
+
+                else:
+                    print('Invalid message format')
+                    return None
+            
+            
+
+
+
             # Render the 'index.html' template with the categorized moods
-            return render_template('index.html',
-                                   moods=reversed(data),
-                                   today_date=today_date,
-                                   today_moods=reversed(today_moods),
-                                   this_week_moods=reversed(this_week_moods),
-                                   older_moods=reversed(older_moods))
+            # return render_template('index.html',
+            #                        moods=data,
+            #                        today_date=today_date,
+            #                        today_moods=reversed(today_moods),
+            #                        this_week_moods=reversed(this_week_moods),
+            #                        older_moods=reversed(older_moods),
+            #                        selected_id=selected_id)
+            return jsonify(data)
 
         except Exception as e:
             # Handle exceptions and return an appropriate JSON response
