@@ -1,4 +1,6 @@
 from .. import socketio
+from flask_socketio import send, emit
+
 
 selected_id = None
 selected_title = None
@@ -32,3 +34,10 @@ def handle_console_log_id(message):
 @socketio.on('my event')
 def handle_message(data):
     print('received message: ' + data)
+
+
+@socketio.on('try_message')
+def handle_try_message(try_message):
+    try_message = 'try me!!!!'
+
+    emit(try_message)
