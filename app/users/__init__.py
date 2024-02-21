@@ -1,22 +1,24 @@
 """ 
-# resources/users.py
+# app/users/__init__.py
 A Blueprint that registers info in API documentation 
 """
 
-from flask import request, current_app, jsonify
+from flask import request, current_app, jsonify, render_template, flash, url_for, redirect, make_response
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from datetime import timedelta
-# from marshmallow import fields
 from schemas import UserSchema, UserRegisterSchema, fields
 from flask_smorest import Api
 from typing import Dict, Any
 
-# Create a Blueprint instance
+from .forms import RegistrationForm
+
+
 # A Blueprint in Flask-smorest is used to divide an API into multiple segments.
 users_blp = Blueprint("users", __name__, description="Operations on users")  #, url_prefix="/users")
+
 
 
 @users_blp.route("/register")
@@ -29,6 +31,9 @@ class UserRegister(MethodView):
         Registers a new user by hashing the provided password and storing user data in the database.
         """
         try:
+            new_user_data = request.get_json()
+            # print(new_user_data)
+
             # Access database and collection from current app context
             db_users = current_app.config['MONGO_DB_USERS']
 
@@ -84,16 +89,27 @@ class UserRegister(MethodView):
                 "expires_in": register_token_expires_in.total_seconds(),
             }
 
-            return jsonify(response_data), 201
+            # return jsonify(response_data), 201
+            # return render_template('users/login.html')#, form=form)
+            # return redirect(url_for(users.login))
+            response = make_response(jsonify(response_data), 201)
+            # Set the access token as a cookie
+            response.set_cookie('access_token', access_token, httponly=False)
+            print(access_token)
+            return response
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
+    
+    def get(self):
+        # form = RegistrationForm()
+        return render_template('users/register.html')#, form=form)
 
 
 @users_blp.route("/login")
 class UserLogin(MethodView):
-
+    # @jwt_required()
     def post(self):
         """
         User Login Endpoint
@@ -115,7 +131,8 @@ class UserLogin(MethodView):
             db_users = current_app.config['MONGO_DB_USERS']
 
             # Get user_data from JSON payload
-            user_data = request.json
+            # user_data = request.json
+            user_data=request.get_json()
 
             # Check if required fields are present in the JSON payload
             if "username" not in user_data or "password" not in user_data:
@@ -128,19 +145,41 @@ class UserLogin(MethodView):
 
             if user and pbkdf2_sha256.verify(user_data["password"],
                                              user["password"]):
-                # User authenticated, generate JWT tokens with additional claims (including 'team')
-                access_token = create_access_token(
-                    identity=str(user["_id"]),
-                    fresh=True)  #, additional_claims={'team': user['team']})
-                refresh_token = create_refresh_token(str(user["_id"]))
 
-                return {
-                    "access_token": access_token,
-                    "refresh_token": refresh_token,
-                    "you work for": user['team']
-                }, 200
+                # User authenticated, generate NEW JWT tokens with additional claims (including 'team')
+                # access_token = create_access_token(
+                #     identity=str(user["_id"]),
+                #     fresh=True)  #, additional_claims={'team': user['team']})
+
+
+                response_data = {
+                    # "access_token": access_token,
+                    # "refresh_token": refresh_token,
+                    "you work for": user['team'],
+                    "message": "correct"
+                }
+
+                response = make_response(jsonify(response_data), 201)
+
+                # response.set_cookie('access_token', access_token, httponly=True)
+                
+                # print(response_data)
+                # return jsonify(response_data), 200
+                return response
 
             return jsonify({"error": "Invalid credentials."}), 401
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
+    def get(self):
+        return render_template('users/login.html')
+
+
+@users_blp.route('/profile')
+class UserProfile(MethodView):
+    # @jwt_required()
+    def get(self):
+        # current_user = get_jwt_identity()
+        return jsonify({"message": "User profile accessed successfully."}), 200#, "user": current_user}), 200
+        # return render_template('users/profile.html')

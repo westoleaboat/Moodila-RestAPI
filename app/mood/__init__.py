@@ -1,4 +1,8 @@
-# import uuid
+""" 
+# app/mood/__init__.py
+A Blueprint that registers info in API documentation 
+"""
+
 from flask import request, current_app, render_template, jsonify
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
@@ -10,32 +14,11 @@ from datetime import datetime
 from flask_socketio import send, emit
 from app import socketio
 
-# Create a Blueprint instance
+#JWT
+from flask_jwt_extended import jwt_required
+
+# Create a Blueprint instance for API
 mood_blp = Blueprint("moods", __name__, description="Operations on moods")
-
-
-# handle ID 
-# @socketio.on('selected_id')
-# def handle_console_log_id(message):
-#     global selected_id
-#     if 'value' in data:
-#         # selected_id = message['value']
-#         selected_id = data.get('value')
-#         print(f'this is your item id: \n{selected_id}\n')
-#     if 'indexnum' in data:
-#         tab_index = message['indexnum']
-#         print(f'this is your item INDEX: \n{tab_index}\n')
-
-#     else:
-#         print('invalid message format')
-#     return selected_id
-
-
-# selected_id = None
-                    
-                    
-# selected_id = None
-
 
 # Define the route
 @mood_blp.route('/')
@@ -55,11 +38,8 @@ class MoodList(MethodView):
         Returns:
             Flask response: Rendered HTML template.
         """
-        # global selected_id
-        # selected_id = None
 
         try:
-            # selected_id = None
 
             # Access database and collection from the current app context
             db_moods = current_app.config['MONGO_DB_MOODS']
@@ -103,9 +83,7 @@ class MoodList(MethodView):
                 else:
                     older_moods.append(item)
 
-            
-            
-
+            # SocketIO test ######################################
             selected_id = data[0]
             # Handle the 'selected_id' event from the client
             @socketio.on('selected_id')
@@ -128,19 +106,21 @@ class MoodList(MethodView):
                 else:
                     print('Invalid message format')
                     return None
+            # SocketIO test ######################################
             
-            
+            # return context if needed
+            context = {
+                'moods':data,
+                'today_date':today_date,
+                'today_moods':reversed(today_moods),
+                'this_week_moods':reversed(this_week_moods),
+                'older_moods':reversed(older_moods),
+                'selected_id':selected_id
+            }
 
-
-
+            # commented out for returning JSON data, no template
             # Render the 'index.html' template with the categorized moods
-            # return render_template('index.html',
-            #                        moods=data,
-            #                        today_date=today_date,
-            #                        today_moods=reversed(today_moods),
-            #                        this_week_moods=reversed(this_week_moods),
-            #                        older_moods=reversed(older_moods),
-            #                        selected_id=selected_id)
+            # return render_template('index.html', context)
             return jsonify(data)
 
         except Exception as e:
@@ -149,17 +129,13 @@ class MoodList(MethodView):
             return jsonify(response_data), 500
 
 
-            # Print data as a table with loop index
-            # table_data = [(i + 1, mood) for i, mood in enumerate(data)]
-            # table_headers = ["Index", "Data"]
-            # table_format = "html"  # You can change it to "grid", "pipe", "html", etc.
-
-            # print(tabulate(table_data, headers=table_headers, tablefmt=table_format))
-
 
 # Add a mood
 @mood_blp.route("/mood")
 class AddMood(MethodView):
+
+    # protect endpoint
+    # @jwt_required() 
     @mood_blp.arguments(MoodSchema(exclude=['created_at']))
     def post(self, mood_data):
         """
@@ -212,8 +188,9 @@ class AddMood(MethodView):
             }
             return jsonify(response_data), 500
 
+
+# return spicific mood
 @mood_blp.route('/mood/<string:mood_id>')
-# @blp.route('/mood/<i:mood_id>')
 class Mood(MethodView):
     '''
     The endpoint now expects an ObjectId for the mood_id parameter, assuming that the _id in MongoDB is of type ObjectId.
@@ -268,30 +245,3 @@ class Mood(MethodView):
                 "error": str(e)
             }
             return jsonify(response_data), 500
-
-    # def delete(self, mood_id):
-    #     try:
-    #         # Access database and collection from the current app context
-    #         db_moods = current_app.config['MONGO_DB_MOODS']
-
-    #         # Delete the document with the specified mood_id
-    #         result = db_moods.delete_one({"_id": mood_id})
-
-    #         # Check if the document was deleted successfully
-    #         if result.deleted_count > 0:
-    #             response_data = {
-    #                 "message": f"Mood with ID {mood_id} deleted successfully."
-    #             }
-    #             return jsonify(response_data)
-    #         else:
-    #             # Return a 404 Not Found response if mood_id is not found
-    #             response_data = {
-    #                 "error": "Mood not found."
-    #             }
-    #             return jsonify(response_data), 404
-
-    #     except Exception as e:
-    #         response_data = {
-    #             "error": str(e)
-    #         }
-    #         return jsonify(response_data), 500
