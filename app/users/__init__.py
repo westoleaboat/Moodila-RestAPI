@@ -7,7 +7,8 @@ from flask import request, current_app, jsonify, render_template, flash, url_for
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
+from blocklist import BLOCKLIST
 from datetime import timedelta
 from schemas import UserSchema, UserRegisterSchema, fields
 from flask_smorest import Api
@@ -15,7 +16,7 @@ from typing import Dict, Any
 from .forms import RegistrationForm
 
 # A Blueprint in Flask-smorest is used to divide an API into multiple segments.
-users_blp = Blueprint("users", __name__, description="Operations on users")  #, url_prefix="/users")
+users_blp = Blueprint("users", __name__, description="Operations on users")  
 
 @users_blp.route("/register")
 class UserRegister(MethodView):
@@ -99,13 +100,23 @@ class UserLogin(MethodView):
             if user and pbkdf2_sha256.verify(user_data["password"],
                                              user["password"]):
 
-                # User authenticated, generate NEW JWT tokens with additional claims (including 'team')
-                access_token = create_access_token(identity=str(user["_id"])) #,
-                #     fresh=True)  #, additional_claims={'team': user['team']})
+                # User authenticated, create access token
+                access_token = create_access_token(identity=str(user["_id"]), fresh=True)
+                # create refresh token
+                refresh_token = create_refresh_token(identity=str(user["_id"]))
 
-             
+                # TODO:
+                # generate JWT tokens with additional claims (including 'team') as below:
+                #
+                # access_token = create_access_token(
+                #     identity=str(user["_id"]),
+                #     fresh=True, 
+                #     additional_claims={'team': user['team']})
+                #
+                # or use JWT claims in app/__init__.py line 58
+                # with @jwt.additional_claims_loader.
 
-                return {"access_token": access_token}
+                return {"access_token": access_token, "refresh_token": refresh_token}
 
             abort(401, message="Invalid credentials.")
 
@@ -113,11 +124,23 @@ class UserLogin(MethodView):
             return jsonify({"error": str(e)}), 500
 
 
+@users_blp.route("/logout")
+class UserLogout(MethodView):
+    
+    @jwt_required()
+    def post(self):
+        jti = get_jwt()["jti"] # Unique Identifier
+        BLOCKLIST.add(jti) # Add jti to blocklist = revoked
+        return {"message": "Successfully logged out"}, 200
 
-# @users_blp.route('/profile')
-# class UserProfile(MethodView):
-#     # @jwt_required()
-#     def get(self):
-#         # current_user = get_jwt_identity()
-#         return jsonify({"message": "User profile accessed successfully."}), 200#, "user": current_user}), 200
-#         # return render_template('users/profile.html')
+
+@users_blp.route("/refresh")
+class TokenRefresh(MethodView):
+    @jwt_required(refresh=True) # not an access token
+    def post(self):
+        current_user = get_jwt_identity() # none if no user
+        new_token = create_access_token(identity=current_user, fresh=False)
+        # Make it clear that when to add the refresh token to the blocklist will depend on the app design
+        jti = get_jwt()["jti"]
+        BLOCKLIST.add(jti)
+        return {"access_token": new_token}, 200
