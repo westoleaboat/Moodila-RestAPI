@@ -1,6 +1,16 @@
 
 # Live @ https://moodila.onrender.com/swagger-ui
+
 Our Flask REST API, designed with a Factory pattern, ensures robustness and scalability. Deployed using Docker containers, it offers enhanced reliability and portability across various environments. The API utilizes PostgreSQL as its primary data storage solution, offering a reliable and efficient database backend. Alternatively, it seamlessly integrates with MongoDB clusters for those preferring a NoSQL database approach. User authentication is implemented using JSON Web Tokens (JWT), ensuring secure access control and authentication mechanisms.
+
+## TODO
+
+### Improve
+- [ ] Token revoke BLOCKLIST in DB not python set()
+
+### Completed
+- [x] Login/Logout users
+- [x] Fresh and Refresh tokens
 
 ## test locally:
 
