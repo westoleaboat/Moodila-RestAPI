@@ -1,6 +1,6 @@
 """ 
 # app/mood/__init__.py
-A Blueprint that registers info in API documentation 
+A Blueprint that registers Moods in API documentation 
 """
 
 from flask import request, current_app, render_template, jsonify
@@ -11,8 +11,8 @@ import json
 from tabulate import tabulate
 from schemas import MoodSchema
 from datetime import datetime
-from flask_socketio import send, emit
-from app import socketio
+# from flask_socketio import send, emit
+# from app import socketio
 
 #JWT
 from flask_jwt_extended import jwt_required
@@ -21,48 +21,27 @@ from flask_jwt_extended import jwt_required
 mood_blp = Blueprint("moods", __name__, description="Operations on moods")
 
 # Define the route
-@mood_blp.route('/')
+@mood_blp.route('/mood')
 class MoodList(MethodView):
+    @jwt_required()
     def get(self):
         """
         Retrieve and display moods based on their creation date.
 
         Accesses the MongoDB client and database from the current app context,
-        retrieves all mood documents from the 'Moodila' database, and categorizes
-        them based on their creation date. Moods created today, within the last
-        week, and older moods are separated into different lists. Each mood's
-        '_id' field is removed, and an 'index' field is added with the current
-        index. The 'created_at' date is formatted for display. Finally, the 
-        retrieved moods are passed to the 'index.html' template for rendering.
+        retrieves all mood documents from the 'Moodila' database, the 
+        retrieved moods are returned.
 
         Returns:
-            Flask response: Rendered HTML template.
+            List of moods.
         """
-
         try:
-
             # Access database and collection from the current app context
             db_moods = current_app.config['MONGO_DB_MOODS']
-
             # Fetch all mood documents from the collection
             moods_collection = db_moods.find({})
-
             # Convert the cursor to a list of dictionaries
             data = list(moods_collection)
-
-            # Separate moods based on 'created_at' date
-            today_moods = []
-            this_week_moods = []
-            older_moods = []
-
-            # Define today's date without time
-            today = datetime.utcnow().date()
-
-            # Format today's date as 'day month year'
-            today_date = today.strftime('%d %b %Y')
-
-            # Parse today_date string to datetime.date object
-            today_date_obj = datetime.strptime(today_date, '%d %b %Y').date()
 
             # Iterate over each mood in the data
             for i, item in enumerate(data, start=1):
@@ -70,73 +49,18 @@ class MoodList(MethodView):
                 item.pop("_id")
                 # Add an 'index' field with the current index
                 item["index"] = i
-                # Format the 'created_at' date for display
-                item["formatted_created_at"] = datetime.strftime(item["created_at"], '%d %b')
-
-                # Check if the mood was created today
-                if item['created_at'].date() == today:
-                    today_moods.append(item)
-                # Check if the mood was created within the last 7 days
-                elif (today_date_obj - item['created_at'].date()).days <= 7:
-                    this_week_moods.append(item)
-                # Otherwise, the mood is older
-                else:
-                    older_moods.append(item)
-
-            # SocketIO test ######################################
-            selected_id = data[0]
-            # Handle the 'selected_id' event from the client
-            @socketio.on('selected_id')
-            def handle_selected_id(message):
-                global selected_id
-                
-                if 'value' in message and 'indexnum' in message:
-                    # selected_id = message['value']
-                    new_selected_id = message['value']
-                    if new_selected_id is not None:
-                        selected_id = new_selected_id
-                    tab_index = message['indexnum']
-                    print(f'This is your item id: {selected_id}')
-                    print(f'This is your item index: {tab_index}')
-                    print(selected_id)
-
-                    return selected_id
-
-
-                else:
-                    print('Invalid message format')
-                    return None
-            # SocketIO test ######################################
             
-            # return context if needed
-            context = {
-                'moods':data,
-                'today_date':today_date,
-                'today_moods':reversed(today_moods),
-                'this_week_moods':reversed(this_week_moods),
-                'older_moods':reversed(older_moods),
-                'selected_id':selected_id
-            }
+            return data
 
-            # commented out for returning JSON data, no template
-            # Render the 'index.html' template with the categorized moods
-            # return render_template('index.html', context)
-            return jsonify(data)
 
         except Exception as e:
             # Handle exceptions and return an appropriate JSON response
             response_data = {"error": str(e)}
             return jsonify(response_data), 500
 
-
-
-# Add a mood
-@mood_blp.route("/mood")
-class AddMood(MethodView):
-
-    # protect endpoint
-    # @jwt_required() 
-    @mood_blp.arguments(MoodSchema(exclude=['created_at']))
+    @jwt_required()
+    @mood_blp.arguments(MoodSchema)#, required=True)
+    @mood_blp.response(201, MoodSchema)
     def post(self, mood_data):
         """
         Add a new Mood to the Database.
@@ -149,12 +73,9 @@ class AddMood(MethodView):
             Flask response: JSON response indicating success or failure.
         """
         try:
+            mood_data=request.get_json()
             # Access database and collection from current app context
             db_moods = current_app.config['MONGO_DB_MOODS']
-
-            # Get mood data from JSON payload in the POST request
-            # mood_data = request.json
-
             # Set 'created_at' to the current time
             mood_data['created_at'] = datetime.utcnow()
 
@@ -163,31 +84,17 @@ class AddMood(MethodView):
                 'title': mood_data["title"],
                 'quote': mood_data["quote"],
                 'author': mood_data["author"],
-                # 'created_at': mood_data['created_at'].strftime('%d %b - %H:%M')
                 'created_at': mood_data['created_at']
             }
-
             # Insert the new mood into the MongoDB collection
             db_moods.insert_one(new_mood)
-            new_mood.pop("_id") # avoid ObjectId bug
-
-            # Format 'created_at' to display only the day and time
-            # new_mood['formatted_created_at'] = new_mood['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+            # new_mood.pop("_id")  # avoid ObjectId bug
             
-            # Return a success message
-            response_data = {
-                "message": "Mood added successfully.",
-                "mood_data": new_mood
-            }
-            return jsonify(response_data), 201
+            return jsonify({"message": "Mood added successfully"}), 201
 
         except Exception as e:
             # Handle exceptions and return an appropriate JSON response
-            response_data = {
-                "error": str(e)
-            }
-            return jsonify(response_data), 500
-
+            abort(500, error=str(e))
 
 # return spicific mood
 @mood_blp.route('/mood/<string:mood_id>')
@@ -199,6 +106,8 @@ class Mood(MethodView):
     The get method retrieves the mood with the specified mood_id from the MongoDB collection and returns it as JSON. If the mood is not found, it returns a 404 Not Found response.
     The delete method deletes the mood with the specified mood_id from the MongoDB collection. It returns a success message if the mood is deleted successfully and a 404 Not Found response if the mood is not found.
     '''
+    @jwt_required()
+    @mood_blp.response(200, MoodSchema)
     def get(self, mood_id):
         """
         Retrieve a mood by its index.

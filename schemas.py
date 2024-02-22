@@ -11,7 +11,6 @@ class MoodSchema(Schema):
     author=fields.Str(required=True)
     created_at = fields.DateTime(dump_only=True, format="%Y-%m-%dT%H:%M:%S.%fZ", missing=lambda: datetime.utcnow())
 
-
     class Meta:
         """
         Meta class for additional configuration.
@@ -42,11 +41,11 @@ class UserSchema(Schema):
         email (str): The email address of the new user (optional).
         team (str): The team the new user belongs to (required).
     """
-    id = fields.Int(dump_only=True, description="The unique identifier for the user (read-only).")
-    username = fields.Str()
+    id = fields.Str(dump_only=True, description="The unique identifier for the user (read-only).")
+    username = fields.Str(required=False)
     password = fields.Str(required=True, load_only=True, description="The password of the new user (load-only).")
     email = fields.Str(required=True, description="The email address of the new user (optional).")
-    team = fields.Str(required=True, description="The team the new user belongs to.")
+    team = fields.List(fields.Str(), required=False, description="The team the new user belongs to.")
 
     class Meta:
         """
@@ -59,9 +58,12 @@ class UserSchema(Schema):
 
 
 class UserRegisterSchema(Schema):
-    id = fields.Int(dump_only=True, description="The unique identifier for the user (read-only).")
-    username = fields.Str()
+    id = fields.Str(dump_only=True, description="The unique identifier for the user (read-only).")
+    username = fields.Str(required=False, description="The username of the new user (optional).")
     password = fields.Str(required=True, load_only=True, description="The password of the new user (load-only).")
-    email = fields.Str(required=True, description="The email address of the new user (optional).")
-    team = fields.Str(required=True, description="The team the new user belongs to.")
+    email = fields.Str(required=True, description="The email address of the new user (required).")
+    team = fields.List(fields.Str(), required=False, description="The team(s) the new user belongs to.")
+
+    class Meta:
+        ordered = True
 

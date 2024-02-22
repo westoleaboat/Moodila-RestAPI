@@ -1,4 +1,5 @@
-'''app/__init__.py: Application package constructor'''
+'''app/__init__.py: Application package constructor.
+    Moods and User Auth in their respective folders '''
 
 from flask import Flask
 from dotenv import load_dotenv
@@ -12,10 +13,10 @@ from pymongo import MongoClient
 # MongoEngine
 from flask_mongoengine import MongoEngine
 # SocketIO
-from flask_socketio import SocketIO
+# from flask_socketio import SocketIO
 
 # socket connection
-socketio = SocketIO(cors_allowed_origins="*",async_mode='threading')
+# socketio = SocketIO(cors_allowed_origins="*",async_mode='threading')
 
 
 def create_app(config_name):
@@ -57,13 +58,16 @@ def create_app(config_name):
     jwt = JWTManager(app)
     db = MongoEngine(app)
 
-    socketio.init_app(app)
+    # socketio.init_app(app)
 
+    ################################## 
     # commented out for MONGO DATABASE
+    #
     # @app.before_first_request
     # def create_tables():
     #     with app.app_context():
     #         db.create_all()
+    ##################################
 
     # Register Blueprints for Mood and Users in API
     from .mood import mood_blp as MoodBlueprint

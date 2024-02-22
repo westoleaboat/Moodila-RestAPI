@@ -2,7 +2,7 @@
 ''' pyinstance.py: Module script where the application instance is defined'''
 
 import os
-from app import create_app, socketio
+from app import create_app#, socketio
 
 '''
 The script begins by creating an application. The configuration is taken from the
@@ -16,4 +16,4 @@ app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
 if __name__ == "__main__":
     # Run the Flask app using the Flask CLI command
-    socketio.run(app, debug=True,logger=True, engineio_logger=True)
+    app.run(app, debug=True,logger=True, engineio_logger=True)
