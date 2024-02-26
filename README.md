@@ -9,6 +9,7 @@ Our Flask REST API, designed with a Factory pattern, ensures robustness and scal
 - [ ] Token revoke BLOCKLIST in DB not python set()
 
 ### Completed
+- [x] Use environment variables for API, db credentials
 - [x] Login/Logout users
 - [x] Fresh and Refresh tokens
 
@@ -27,6 +28,18 @@ source .venv/bin/activate
 install packages with pip
 ```
 pip install -r requirements.txt
+```
+(needed) Provide .env file with following variables:
+these need to be loaded in deployment site config
+```
+SECRET_KEY=<SOME_SUPER_HARD_STRING>
+# M_USERNAME=
+# M_PASSWORD=
+# CLUSTER=
+JWT_SECRET_KEY=<SOME_SUPER_HARD_STRING>
+# cluster connection string format: see https://www.mongodb.com/docs/manual/reference/connection-string/
+# 'mongodb+srv://<<USERNAME>>:<<PASSWORD>>@<<CLUSTER>>.mongodb.net/'
+MONGO_URI=<YOUR_MONGODB_CLUSTER>
 ```
 
 run application

@@ -4,6 +4,7 @@
 from flask import Flask, jsonify
 from dotenv import load_dotenv
 from flask_smorest import Api
+import os
 # config
 from config import config
 # JTW user auth
@@ -23,23 +24,35 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
     load_dotenv()
-    
-    # MongoDB configuration
-    mongo_client = MongoClient('mongodb+srv://Tomaschac:cat@fedos27.hrtdm4r.mongodb.net/', username='Tomaschac', password='cat')
+
+    #######################################################################
+    # MongoDB configuration - https://www.mongodb.com/docs/drivers/pymongo/
+    #
+    # your Atlas connection string
+    uri = os.getenv('MONGO_URI')
+    # Create a new client and connect to the server
+    mongo_client = MongoClient(uri)#, 
+    # Send a ping to confirm a successful connection
+    try:
+        mongo_client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+
+    except Exception as e:
+        print(e)
+
     # Access Moodila database
     moodila_db = mongo_client['Moodila']
     # Access the 'users' collection in the 'Moodila' database
     users_collection = moodila_db['users']
     # Access the 'moods' collection in the 'Moodila' database
     moods_collection = moodila_db['moods']
-
     # Store MongoDB objects in Flask app.config
     app.config['MONGO_CLIENT'] = mongo_client
     app.config['MONGO_DB_USERS'] = users_collection
     app.config['MONGO_DB_MOODS'] = moods_collection
 
-    app.config['SECRET_KEY'] = 'super-hard to guess string'
-    app.config['JWT_SECRET_KEY'] = 'KHANDUSHA'
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
     app.config["PROPAGATE_EXCEPTIONS"] = True
 
     # Swagger-UI
